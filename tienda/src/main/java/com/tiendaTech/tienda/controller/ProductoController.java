@@ -1,6 +1,12 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tiendaTech.tienda.controller;
- 
+
+
 import com.tiendaTech.tienda.domain.Producto;
+import com.tiendaTech.tienda.service.CategoriaService;
 import com.tiendaTech.tienda.service.ProductoService;
 import jakarta.validation.Valid;
 import java.util.Locale;
@@ -15,36 +21,42 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
- 
+
 @Controller
 @RequestMapping("/producto")
 public class ProductoController {
- 
+
     private final ProductoService productoService;
+    private final CategoriaService categoriaService;
     private final MessageSource messageSource;
- 
-    public ProductoController(ProductoService productoService, MessageSource messageSource) {
+
+    public ProductoController(ProductoService productoService, CategoriaService categoriaService, MessageSource messageSource) {
         this.productoService = productoService;
+        this.categoriaService = categoriaService;
         this.messageSource = messageSource;
     }
- 
+
+    
+
     @GetMapping("/listado")
     public String listado(Model model) {
         var productos = productoService.getProductos(false);
         model.addAttribute("productos", productos);
+        var categorias = categoriaService.getCategorias(true);
+        model.addAttribute("categorias", categorias);
         model.addAttribute("totalProductos", productos.size());
         return "/producto/listado";
     }
- 
+
     @PostMapping("/guardar")
     public String guardar(@Valid Producto producto, @RequestParam MultipartFile imagenFile, RedirectAttributes redirectAttributes) {
- 
+
         productoService.save(producto, imagenFile);
         redirectAttributes.addFlashAttribute("todoOk", messageSource.getMessage("mensaje.actualizado", null, Locale.getDefault()));
- 
+
         return "redirect:/producto/listado";
     }
- 
+
     @PostMapping("/eliminar")
     public String eliminar(@RequestParam Integer idProducto, RedirectAttributes redirectAttributes) {
         String titulo = "todoOk";
@@ -64,7 +76,7 @@ public class ProductoController {
         redirectAttributes.addFlashAttribute(titulo, messageSource.getMessage(detalle, null, Locale.getDefault()));
         return "redirect:/producto/listado";
     }
- 
+
     @GetMapping("/modificar/{idProducto}")
     public String modificar(@PathVariable("idProducto") Integer idProducto, Model model, RedirectAttributes redirectAttributes) {
         Optional<Producto> productoOpt = productoService.getProducto(idProducto);
@@ -73,38 +85,8 @@ public class ProductoController {
             return "redirect:/producto/listado";
         }
         model.addAttribute("producto", productoOpt.get());
+         var categorias = categoriaService.getCategorias(true);
+        model.addAttribute("categorias", categorias);
         return "/producto/modifica";
     }
-    
-        @PostMapping("/consultaDerivada")
-    public String consultaDerivada(@RequestParam() double precioInf,
-            @RequestParam() double precioSup, Model model) {
-        var lista = productoService.consultaDerivada(precioInf, precioSup);
-        model.addAttribute("productos", lista);
-        model.addAttribute("precioInf", precioInf);
-        model.addAttribute("precioSup", precioSup);
-        return "/consultas/listado";
-    }
-
-    @PostMapping("/consultaJPQL")
-    public String consultaJPQL(@RequestParam() double precioInf,
-            @RequestParam() double precioSup,
-            Model model) {
-        var productos = productoService.consultaJPQL(precioInf, precioSup);
-        model.addAttribute("productos", productos);
-        model.addAttribute("precioInf", precioInf);
-        model.addAttribute("precioSup", precioSup);
-        return "/consultas/listado";
-    }
-
-    @PostMapping("/consultaSQL")
-    public String consultaSQL(@RequestParam() double precioInf,
-            @RequestParam() double precioSup, Model model) {
-        var lista = productoService.consultaSQL(precioInf, precioSup);
-        model.addAttribute("productos", lista);
-        model.addAttribute("precioInf", precioInf);
-        model.addAttribute("precioSup", precioSup);
-        return "/consultas/listado";
-    }
- 
 }

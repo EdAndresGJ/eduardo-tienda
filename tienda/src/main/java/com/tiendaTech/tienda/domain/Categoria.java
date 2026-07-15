@@ -6,10 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import lombok.Data;
@@ -37,10 +35,6 @@ public class Categoria implements Serializable {
     private String rutaImagen;
 
     @Column(name = "activo")
-    private Boolean activo;
-    
-    @OneToMany(mappedBy = "categoria")
-    private List<Producto> productos;
+    private Boolean activo;     
+  
 }
-
-
