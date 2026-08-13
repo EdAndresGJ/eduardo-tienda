@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.tiendaTech.tienda.domain;
 
 import jakarta.persistence.*;
@@ -21,7 +17,7 @@ public class Producto implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_producto")
     private Integer idProducto;
-    private Integer idCategoria;
+    // private Integer idCategoria; Ya no se utiliza por la asociación
 
     @Column(nullable = false, length = 50)
     @NotBlank(message = "La descripción no puede estar vacía.")
@@ -44,4 +40,7 @@ public class Producto implements Serializable {
     private String rutaImagen;
     private boolean activo;
 
+    @ManyToOne
+    @JoinColumn(name = "id_categoria")
+    private Categoria categoria;
 }
